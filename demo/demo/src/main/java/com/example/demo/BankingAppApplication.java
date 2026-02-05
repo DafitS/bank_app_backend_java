@@ -32,4 +32,4 @@ public class BankingAppApplication {
 //   ↑
 //HTTP Response
 
-// Dorobic obsluge wjatkow, dodac tabele z historia np wplata wypłata, data, typ(enum) itp, pod filtracje danych, logowanie log2j
+// Dorobic obsluge wjatkow, dodac tabele z historia np wplata wypłata, data, typ(enum) itp, pod filtracje danych, logowanie log2j, funkcja logowania pod jwt

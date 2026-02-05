@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 
@@ -19,11 +20,20 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "account_from")
+    @Column(name = "account_from", nullable = false)
     private String accountFrom;
-    @Column(name = "account_to")
+
+    @Column(name = "account_to", nullable = false)
     private String accountTo;
-    private Double balance;
-    @Column(name = "created_at")
-    private LocalDateTime time;
+
+    @Column(nullable = false, precision = 19, scale = 2)
+    private BigDecimal amount;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

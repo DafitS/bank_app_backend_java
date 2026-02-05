@@ -11,8 +11,8 @@ public class TransactionMapper {
                 dto.getId(),
                 dto.getAccountFrom(),
                 dto.getAccountTo(),
-                dto.getBalance(),
-                dto.getTime()
+                dto.getAmount(),
+                dto.getCreatedAt()
         );
     }
 
@@ -22,8 +22,8 @@ public class TransactionMapper {
                 transaction.getId(),
                 transaction.getAccountFrom(),
                 transaction.getAccountTo(),
-                transaction.getBalance(),
-                transaction.getTime()
+                transaction.getAmount(),
+                transaction.getCreatedAt()
         );
     }
 }

@@ -1,7 +1,7 @@
 package com.example.demo.exceptions;
 
-public class UserNotExistExceptions extends ValidationExceptions {
-    public UserNotExistExceptions(String message, String userName) {
+public class UserNotExistException extends ValidationException {
+    public UserNotExistException(String message, String userName) {
         super(message);
         this.userName = userName;
     }

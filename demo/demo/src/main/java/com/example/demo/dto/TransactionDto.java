@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 
@@ -16,6 +17,6 @@ public class TransactionDto {
 
     private String accountFrom;
     private String accountTo;
-    private Double balance;
-    private LocalDateTime time;
+    private BigDecimal amount;
+    private LocalDateTime createdAt;
 }

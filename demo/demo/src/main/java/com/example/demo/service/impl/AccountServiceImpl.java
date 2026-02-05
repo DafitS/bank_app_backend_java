@@ -3,26 +3,25 @@ package com.example.demo.service.impl;
 import com.example.demo.dto.AccountDto;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.User;
-import com.example.demo.exceptions.InvalidArgumentExceptions;
-import com.example.demo.exceptions.RequiredFiledMissingExceptions;
-import com.example.demo.exceptions.UserNotExistExceptions;
+import com.example.demo.exceptions.AccountNotExistException;
+import com.example.demo.exceptions.InvalidArgumentException;
+import com.example.demo.exceptions.RequiredFiledMissingException;
+import com.example.demo.exceptions.UserNotExistException;
 import com.example.demo.mapper.AccountMapper;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.AccountService;
-import com.example.demo.service.UserService;
 import org.springframework.stereotype.Service;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class AccountServiceImpl implements AccountService{
 
-    private AccountRepository accountRepository;
-    private UserRepository userRepository;
+    private final AccountRepository accountRepository;
+    private final UserRepository userRepository;
 
     public AccountServiceImpl(AccountRepository accountRepository, UserRepository userRepository)
     {
@@ -32,10 +31,10 @@ public class AccountServiceImpl implements AccountService{
 
     @Override
     public AccountDto createAccount(AccountDto accountDto) {
-        walidate(accountDto);
+        validate(accountDto);
         User user = userRepository
                 .findById(accountDto.getUserId())
-                .orElseThrow(()->new UserNotExistExceptions("User not found!", accountDto.getAccountHolderName()));
+                .orElseThrow(()->new UserNotExistException("User not found!", accountDto.getAccountHolderName()));
 
         Account account = AccountMapper.mapToAccount(accountDto, user);
         Account savedAccount = accountRepository.save(account);
@@ -43,15 +42,23 @@ public class AccountServiceImpl implements AccountService{
         return AccountMapper.mapToAccountDto(savedAccount);
     }
 
-    private void walidate(AccountDto accountDto) {
-        if (accountDto.getAccountNumber() == null)
+    private void validate(AccountDto accountDto) {
+        if (accountDto.getAccountNumber() == null || accountDto.getAccountNumber().isBlank())
         {
-            throw new RequiredFiledMissingExceptions("Required Account Number!");
+            throw new RequiredFiledMissingException("Required Account Number!");
+        }
+        if (accountDto.getUserId() == null)
+        {
+            throw new RequiredFiledMissingException("UserID is Required!");
         }
         try{
-            Long.valueOf(accountDto.getAccountNumber());
+            Long accountNumber = Long.valueOf(accountDto.getAccountNumber());
+            if(accountNumber <= 0)
+            {
+                throw new InvalidArgumentException("Account number must be positive");
+            }
         } catch (NumberFormatException e) {
-            throw new InvalidArgumentExceptions("This String Not Number!");
+            throw new InvalidArgumentException("This String Not Number!");
         }
 
     }
@@ -60,30 +67,42 @@ public class AccountServiceImpl implements AccountService{
     public AccountDto getAccountById(Long id) {
         Account account = accountRepository
                 .findById(id)
-                .orElseThrow(()->new RuntimeException("Konto nie istnieje!"));
+                .orElseThrow(()->new AccountNotExistException("Account not Found!", id));
 
         return AccountMapper.mapToAccountDto(account);
     }
 
     @Override
-    public AccountDto deposit(Long id, double amount) {
+    public AccountDto deposit(Long id, BigDecimal amount) {
+
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidArgumentException("Deposit amount must be greater than zero");
+        }
         Account account = accountRepository
                 .findById(id)
-                .orElseThrow(()->new RuntimeException("Konto nie istnieje"));
+                .orElseThrow(()->new AccountNotExistException("Account not Found!", id));
 
-        account.setAmount(account.getAmount() + amount);
+        account.setAmount(account.getAmount().add(amount));
         Account saveAccount = accountRepository.save(account);
 
         return AccountMapper.mapToAccountDto(saveAccount);
     }
 
     @Override
-    public AccountDto withdraw(Long id, double amount) {
+    public AccountDto withdraw(Long id, BigDecimal amount) {
+
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidArgumentException("Withdraw amount must be greater than zero");
+        }
         Account account = accountRepository
                 .findById(id)
-                .orElseThrow(()-> new RuntimeException("Konto nie istnieje"));
+                .orElseThrow(()-> new AccountNotExistException("Account not Found!", id));
 
-        account.setAmount(account.getAmount() - amount);
+        if (account.getAmount().compareTo(amount) < 0) {
+            throw new InvalidArgumentException("No funds to withdraw!");
+        }
+
+        account.setAmount(account.getAmount().subtract(amount));
         Account saveAccount = accountRepository.save(account);
 
         return AccountMapper.mapToAccountDto(saveAccount);
@@ -100,9 +119,7 @@ public class AccountServiceImpl implements AccountService{
 
     @Override
     public void deleteAccountById(Long id) {
-        Account account = accountRepository
-                .findById(id)
-                .orElseThrow(()-> new RuntimeException("Konto nie istnieje!"));
+        if(!accountRepository.existsById(id)) throw new AccountNotExistException("Account not Found!", id);
 
          accountRepository.deleteById(id);
     }

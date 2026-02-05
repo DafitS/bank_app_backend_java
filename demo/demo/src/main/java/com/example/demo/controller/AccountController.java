@@ -1,15 +1,14 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.AccountDto;
-import com.example.demo.exceptions.UserNotExistExceptions;
-import com.example.demo.exceptions.ValidationExceptions;
+import com.example.demo.exceptions.ValidationException;
 import com.example.demo.service.AccountService;
 import lombok.extern.log4j.Log4j2;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +28,7 @@ public class AccountController {
         try {
             return new ResponseEntity<>(accountService.createAccount(accountDto), HttpStatus.CREATED);
         }
-        catch (ValidationExceptions e) {
+        catch (ValidationException e) {
             log.error("Validation Error! = {} {}", e.toString(), accountDto);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -54,14 +53,14 @@ public class AccountController {
     }
 
     @PutMapping("/{id}/deposit")
-    public ResponseEntity<AccountDto> getAccountByIdToDeposit(@PathVariable Long id, @RequestBody Map<String, Double> mapToDeposit)
+    public ResponseEntity<AccountDto> getAccountByIdToDeposit(@PathVariable Long id, @RequestBody Map<String, BigDecimal> mapToDeposit)
     {
         AccountDto accountDto = accountService.deposit(id, mapToDeposit.get("amount"));
         return ResponseEntity.ok(accountDto);
     }
 
     @PutMapping("/{id}/withdraw")
-    public ResponseEntity<AccountDto> getAccountByIdToWithdraw(@PathVariable Long id, @RequestBody Map<String, Double> mapToWithdraw)
+    public ResponseEntity<AccountDto> getAccountByIdToWithdraw(@PathVariable Long id, @RequestBody Map<String, BigDecimal> mapToWithdraw)
     {
         AccountDto accountDto = accountService.withdraw(id, mapToWithdraw.get("withdraw"));
         return ResponseEntity.ok(accountDto);
