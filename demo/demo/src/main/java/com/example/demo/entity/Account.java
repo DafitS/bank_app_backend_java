@@ -26,7 +26,8 @@ public class Account {
     @Column(unique = true)
     private String accountNumber;
 
-    private BigDecimal amount;
+    @Column(nullable = false, precision = 19, scale = 2)
+    private BigDecimal amount = BigDecimal.ZERO;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

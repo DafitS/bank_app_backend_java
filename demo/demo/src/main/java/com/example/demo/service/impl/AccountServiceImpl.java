@@ -2,18 +2,22 @@ package com.example.demo.service.impl;
 
 import com.example.demo.dto.AccountDto;
 import com.example.demo.entity.Account;
+import com.example.demo.entity.OperationHistory;
 import com.example.demo.entity.User;
 import com.example.demo.exceptions.AccountNotExistException;
 import com.example.demo.exceptions.InvalidArgumentException;
 import com.example.demo.exceptions.RequiredFiledMissingException;
 import com.example.demo.exceptions.UserNotExistException;
 import com.example.demo.mapper.AccountMapper;
+import com.example.demo.option.OperationType;
 import com.example.demo.repository.AccountRepository;
+import com.example.demo.repository.OperationHistoryRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.AccountService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,11 +26,13 @@ public class AccountServiceImpl implements AccountService{
 
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
+    private final OperationHistoryRepository historyRepository;
 
-    public AccountServiceImpl(AccountRepository accountRepository, UserRepository userRepository)
+    public AccountServiceImpl(AccountRepository accountRepository, UserRepository userRepository, OperationHistoryRepository historyRepository)
     {
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
+        this.historyRepository = historyRepository;
     }
 
     @Override
@@ -85,6 +91,15 @@ public class AccountServiceImpl implements AccountService{
         account.setAmount(account.getAmount().add(amount));
         Account saveAccount = accountRepository.save(account);
 
+        OperationHistory history = new OperationHistory();
+        history.setAccount(saveAccount);
+        history.setOperationType(OperationType.DEPOSIT);
+        history.setAmount(amount);
+        history.setBalanceAfter(saveAccount.getAmount());
+        history.setCreatedAt(LocalDateTime.now());
+
+        historyRepository.save(history);
+
         return AccountMapper.mapToAccountDto(saveAccount);
     }
 
@@ -104,6 +119,15 @@ public class AccountServiceImpl implements AccountService{
 
         account.setAmount(account.getAmount().subtract(amount));
         Account saveAccount = accountRepository.save(account);
+
+        OperationHistory history = new OperationHistory();
+        history.setAccount(saveAccount);
+        history.setOperationType(OperationType.WITHDRAW);
+        history.setAmount(amount);
+        history.setBalanceAfter(saveAccount.getAmount());
+        history.setCreatedAt(LocalDateTime.now());
+
+        historyRepository.save(history);
 
         return AccountMapper.mapToAccountDto(saveAccount);
     }
