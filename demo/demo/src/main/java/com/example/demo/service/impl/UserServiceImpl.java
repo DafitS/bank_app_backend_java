@@ -1,6 +1,8 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.dto.UserDto;
+import com.example.demo.dto.user.UserCreateDto;
+import com.example.demo.dto.user.UserResponseDto;
+import com.example.demo.dto.user.UserUpdateDto;
 import com.example.demo.entity.User;
 import com.example.demo.exceptions.UserNotExistExceptionById;
 import com.example.demo.mapper.UserMapper;
@@ -19,27 +21,51 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto createUser(UserDto userDto) {
-        User user = UserMapper.mapToUser(userDto);
+    public UserResponseDto createUser(UserCreateDto userCreateDto) {
+        User user = UserMapper.mapToUser(userCreateDto);
         User savedUser = userRepository.save(user);
 
-
-        return UserMapper.mapToUserDto(savedUser);
+        return UserMapper.mapToUserResponseDto(savedUser);
     }
 
     @Override
-    public UserDto getUserById(Long id) {
+    public UserResponseDto getUserById(Long id) {
             User user = userRepository
                     .findById(id)
                     .orElseThrow(() -> new UserNotExistExceptionById("User not found!", id));
-            return UserMapper.mapToUserDto(user);
+            return UserMapper.mapToUserResponseDto(user);
     }
 
     @Override
-    public UserDto getUserByEmail(String email) {
+    public UserResponseDto getUserByEmail(String email) {
         User user = userRepository
                 .findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return  UserMapper.mapToUserDto(user);
+        return  UserMapper.mapToUserResponseDto(user);
     }
+
+    @Override
+    public UserResponseDto updateUser(Long id, UserUpdateDto dto) {
+        User user = userRepository
+                .findById(id)
+                .orElseThrow(() -> new UserNotExistExceptionById("User not found!", id));
+
+        if (dto.getName() != null) user.setName(dto.getName());
+        if (dto.getSurname() != null) user.setSurname(dto.getSurname());
+        if (dto.getEmail() != null) user.setEmail(dto.getEmail());
+        if (dto.getPassword() != null) user.setPassword(dto.getPassword());
+
+        User savedUser = userRepository.save(user);
+        return UserMapper.mapToUserResponseDto(savedUser);
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        User user = userRepository
+                .findById(id)
+                .orElseThrow(() -> new UserNotExistExceptionById("User not found!", id));
+        userRepository.delete(user);
+    }
+
+
 }

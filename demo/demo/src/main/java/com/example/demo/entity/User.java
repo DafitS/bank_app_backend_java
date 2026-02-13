@@ -28,8 +28,8 @@ public class User implements UserDetails {
     @Column(name = "user_email")
     private String email;
     private String password;
-    @Column(name = "personal_id_number", unique = true)
-    private Integer pesel;
+    @Column(name = "personal_id_number", unique = true, length = 11)
+    private String pesel;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore

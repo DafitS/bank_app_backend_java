@@ -1,11 +1,12 @@
 package com.example.demo.mapper;
 
-import com.example.demo.dto.UserDto;
+import com.example.demo.dto.user.UserCreateDto;
+import com.example.demo.dto.user.UserResponseDto;
 import com.example.demo.entity.User;
 
 public class UserMapper {
 
-    public static User mapToUser(UserDto dto) {
+    public static User mapToUser(UserCreateDto dto) {
         User user = new User();
         user.setId(null);
         user.setName(dto.getName());
@@ -13,20 +14,16 @@ public class UserMapper {
         user.setEmail(dto.getEmail());
         user.setPassword(dto.getPassword());
         user.setPesel(dto.getPesel());
-
         return user;
     }
 
-
-    public static UserDto mapToUserDto(User user)
-    {
-        return new UserDto(
-             user.getId(),
-             user.getName(),
-             user.getSurname(),
-             user.getEmail(),
-             user.getPassword(),
-             user.getPesel()
+    public static UserResponseDto mapToUserResponseDto(User user) {
+        return new UserResponseDto(
+                user.getId(),
+                user.getName(),
+                user.getSurname(),
+                user.getEmail(),
+                user.getPesel()
         );
     }
 }
