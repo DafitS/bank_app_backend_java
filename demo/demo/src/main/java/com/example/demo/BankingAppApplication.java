@@ -31,5 +31,3 @@ public class BankingAppApplication {
 //Controller
 //   ↑
 //HTTP Response
-
-// Dorobic obsluge wjatkow, dodac tabele z historia np wplata wypłata, data, typ(enum) itp, pod filtracje danych, logowanie log2j, funkcja logowania pod jwt

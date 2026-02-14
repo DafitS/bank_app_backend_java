@@ -1,12 +1,13 @@
 package com.example.demo.mapper;
 
-import com.example.demo.dto.AccountDto;
+import com.example.demo.dto.account.AccountCreateDto;
+import com.example.demo.dto.account.AccountResponseDto;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.User;
 
 public class AccountMapper {
 
-    public static Account mapToAccount(AccountDto dto, User user) {
+    public static Account mapToAccount(AccountCreateDto dto, User user) {
         Account account = new Account();
         account.setId(null);
         account.setAccountHolderName(dto.getAccountHolderName());
@@ -18,13 +19,12 @@ public class AccountMapper {
     }
 
 
-    public static AccountDto mapToAccountDto(Account account) {
-        return new AccountDto(
-                account.getId(),
+    public static AccountResponseDto mapToAccountResponseDto(Account account) {
+        return new AccountResponseDto(
                 account.getAccountHolderName(),
                 account.getAccountNumber(),
-                account.getAmount(),
-                account.getUser().getId()
+                account.getAmount()
+
         );
     }
 }

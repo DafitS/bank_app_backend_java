@@ -1,16 +1,16 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.AccountDto;
-import com.example.demo.exceptions.ValidationException;
+import com.example.demo.dto.account.AccountCreateDto;
+import com.example.demo.dto.account.AccountResponseDto;
+import com.example.demo.dto.account.AmountDto;
 import com.example.demo.service.AccountService;
+import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 @Log4j2
 @RestController
@@ -24,46 +24,37 @@ public class AccountController {
     }
 
     @PostMapping
-    public ResponseEntity<AccountDto> addAccount(@RequestBody AccountDto accountDto) {
-        try {
-            return new ResponseEntity<>(accountService.createAccount(accountDto), HttpStatus.CREATED);
-        }
-        catch (ValidationException e) {
-            log.error("Validation Error! = {} {}", e.toString(), accountDto);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        catch (Exception e) {
-            log.error("addAccount {}", accountDto, e);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<AccountResponseDto> addAccount(
+            @RequestBody AccountCreateDto accountCreateDto) {
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(accountService.createAccount(accountCreateDto));
     }
 
-
     @GetMapping
-    public ResponseEntity<List<AccountDto>> getAllAccounts()
+    public ResponseEntity<List<AccountResponseDto>> getAllAccounts()
     {
         return new ResponseEntity<>(accountService.getAllAccounts(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AccountDto> getAccountById(@PathVariable Long id)
+    public ResponseEntity<AccountResponseDto> getAccountById(@PathVariable Long id)
     {
-        AccountDto accountDto = accountService.getAccountById(id);
-        return ResponseEntity.ok(accountDto);
+        return ResponseEntity.ok(accountService.getAccountById(id));
     }
 
     @PutMapping("/{id}/deposit")
-    public ResponseEntity<AccountDto> getAccountByIdToDeposit(@PathVariable Long id, @RequestBody Map<String, BigDecimal> mapToDeposit)
+    public ResponseEntity<AccountResponseDto> getAccountByIdToDeposit(@PathVariable Long id,  @Valid @RequestBody AmountDto amountDto)
     {
-        AccountDto accountDto = accountService.deposit(id, mapToDeposit.get("amount"));
-        return ResponseEntity.ok(accountDto);
+        AccountResponseDto accountResponseDto = accountService.deposit(id, amountDto.getAmount());
+        return ResponseEntity.ok(accountResponseDto);
     }
 
     @PutMapping("/{id}/withdraw")
-    public ResponseEntity<AccountDto> getAccountByIdToWithdraw(@PathVariable Long id, @RequestBody Map<String, BigDecimal> mapToWithdraw)
+    public ResponseEntity<AccountResponseDto> getAccountByIdToWithdraw(@PathVariable Long id,  @Valid @RequestBody AmountDto amountDto)
     {
-        AccountDto accountDto = accountService.withdraw(id, mapToWithdraw.get("withdraw"));
-        return ResponseEntity.ok(accountDto);
+        AccountResponseDto accountResponseDto = accountService.withdraw(id, amountDto.getAmount());
+        return ResponseEntity.ok(accountResponseDto);
     }
 
     @DeleteMapping("/{id}")

@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.dto.AccountDto;
+import com.example.demo.dto.account.AccountCreateDto;
+import com.example.demo.dto.account.AccountResponseDto;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.OperationHistory;
 import com.example.demo.entity.User;
@@ -36,19 +37,19 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
-    public AccountDto createAccount(AccountDto accountDto) {
-        validate(accountDto);
+    public AccountResponseDto createAccount(AccountCreateDto accountCreateDto) {
+        validate(accountCreateDto);
         User user = userRepository
-                .findById(accountDto.getUserId())
-                .orElseThrow(()->new UserNotExistException("User not found!", accountDto.getAccountHolderName()));
+                .findById(accountCreateDto.getUserId())
+                .orElseThrow(()->new UserNotExistException("User not found!", accountCreateDto.getAccountHolderName()));
 
-        Account account = AccountMapper.mapToAccount(accountDto, user);
+        Account account = AccountMapper.mapToAccount(accountCreateDto, user);
         Account savedAccount = accountRepository.save(account);
 
-        return AccountMapper.mapToAccountDto(savedAccount);
+        return AccountMapper.mapToAccountResponseDto(savedAccount);
     }
 
-    private void validate(AccountDto accountDto) {
+    private void validate(AccountCreateDto accountDto) {
         if (accountDto.getAccountNumber() == null || accountDto.getAccountNumber().isBlank())
         {
             throw new RequiredFiledMissingException("Required Account Number!");
@@ -70,16 +71,16 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
-    public AccountDto getAccountById(Long id) {
+    public AccountResponseDto getAccountById(Long id) {
         Account account = accountRepository
                 .findById(id)
                 .orElseThrow(()->new AccountNotExistException("Account not Found!", id));
 
-        return AccountMapper.mapToAccountDto(account);
+        return AccountMapper.mapToAccountResponseDto(account);
     }
 
     @Override
-    public AccountDto deposit(Long id, BigDecimal amount) {
+    public AccountResponseDto deposit(Long id, BigDecimal amount) {
 
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new InvalidArgumentException("Deposit amount must be greater than zero");
@@ -100,11 +101,11 @@ public class AccountServiceImpl implements AccountService{
 
         historyRepository.save(history);
 
-        return AccountMapper.mapToAccountDto(saveAccount);
+        return AccountMapper.mapToAccountResponseDto(saveAccount);
     }
 
     @Override
-    public AccountDto withdraw(Long id, BigDecimal amount) {
+    public AccountResponseDto withdraw(Long id, BigDecimal amount) {
 
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new InvalidArgumentException("Withdraw amount must be greater than zero");
@@ -129,13 +130,13 @@ public class AccountServiceImpl implements AccountService{
 
         historyRepository.save(history);
 
-        return AccountMapper.mapToAccountDto(saveAccount);
+        return AccountMapper.mapToAccountResponseDto(saveAccount);
     }
 
     @Override
-    public List<AccountDto> getAllAccounts() {
+    public List<AccountResponseDto> getAllAccounts() {
         List<Account> accounts = accountRepository.findAll();
-        return accounts.stream().map((account) -> AccountMapper.mapToAccountDto(account))
+        return accounts.stream().map((account) -> AccountMapper.mapToAccountResponseDto(account))
                 .collect(Collectors.toList());
 
 

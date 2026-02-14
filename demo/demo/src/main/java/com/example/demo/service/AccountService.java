@@ -1,23 +1,22 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.AccountDto;
-import com.example.demo.entity.Account;
-import com.example.demo.entity.User;
+import com.example.demo.dto.account.AccountCreateDto;
+import com.example.demo.dto.account.AccountResponseDto;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 public interface AccountService {
 
-    AccountDto createAccount(AccountDto accountDto);
+    AccountResponseDto createAccount(AccountCreateDto accountCreateDto);
 
-    AccountDto getAccountById(Long id);
+    AccountResponseDto getAccountById(Long id);
 
-    AccountDto deposit(Long id, BigDecimal amount);
+    AccountResponseDto deposit(Long id, BigDecimal amount);
 
-    AccountDto withdraw(Long id, BigDecimal amount);
+    AccountResponseDto withdraw(Long id, BigDecimal amount);
 
-    List<AccountDto> getAllAccounts();
+    List<AccountResponseDto> getAllAccounts();
 
     void deleteAccountById(Long id);
 }
