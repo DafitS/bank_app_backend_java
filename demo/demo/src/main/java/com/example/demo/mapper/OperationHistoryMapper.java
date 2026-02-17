@@ -1,6 +1,6 @@
 package com.example.demo.mapper;
 
-import com.example.demo.dto.OperationHistoryDto;
+import com.example.demo.dto.history.OperationHistoryDto;
 import com.example.demo.entity.OperationHistory;
 
 public class OperationHistoryMapper {

@@ -1,6 +1,6 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.dto.OperationHistoryDto;
+import com.example.demo.dto.history.OperationHistoryDto;
 import com.example.demo.entity.OperationHistory;
 import com.example.demo.mapper.OperationHistoryMapper;
 import com.example.demo.repository.OperationHistoryRepository;

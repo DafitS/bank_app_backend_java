@@ -1,6 +1,5 @@
-package com.example.demo.dto;
+package com.example.demo.dto.transaction;
 
-import com.example.demo.option.OperationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,13 +10,12 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OperationHistoryDto {
+public class TransactionResponseDto {
 
-    private OperationType operationType;
+    private Long id;
+
+    private String accountFrom;
+    private String accountTo;
     private BigDecimal amount;
-    private BigDecimal balanceAfter;
     private LocalDateTime createdAt;
-
-    private String relatedAccountNumber;
-
 }

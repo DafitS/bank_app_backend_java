@@ -1,4 +1,4 @@
-package com.example.demo.exceptions;
+package com.example.demo.exceptions.custom;
 
 public class ValidationException extends RuntimeException {
     public ValidationException(String message) {

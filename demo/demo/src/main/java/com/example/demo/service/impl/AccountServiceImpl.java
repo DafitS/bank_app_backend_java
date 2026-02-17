@@ -5,10 +5,10 @@ import com.example.demo.dto.account.AccountResponseDto;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.OperationHistory;
 import com.example.demo.entity.User;
-import com.example.demo.exceptions.AccountNotExistException;
-import com.example.demo.exceptions.InvalidArgumentException;
-import com.example.demo.exceptions.RequiredFiledMissingException;
-import com.example.demo.exceptions.UserNotExistException;
+import com.example.demo.exceptions.custom.AccountNotExistException;
+import com.example.demo.exceptions.custom.InvalidArgumentException;
+import com.example.demo.exceptions.custom.RequiredFiledMissingException;
+import com.example.demo.exceptions.custom.UserNotExistException;
 import com.example.demo.mapper.AccountMapper;
 import com.example.demo.option.OperationType;
 import com.example.demo.repository.AccountRepository;
@@ -58,16 +58,9 @@ public class AccountServiceImpl implements AccountService{
         {
             throw new RequiredFiledMissingException("UserID is Required!");
         }
-        try{
-            Long accountNumber = Long.valueOf(accountDto.getAccountNumber());
-            if(accountNumber <= 0)
-            {
-                throw new InvalidArgumentException("Account number must be positive");
-            }
-        } catch (NumberFormatException e) {
-            throw new InvalidArgumentException("This String Not Number!");
+        if (!accountDto.getAccountNumber().matches("\\d{26}")) {
+            throw new InvalidArgumentException("Account number must contain exactly 26 digits");
         }
-
     }
 
     @Override

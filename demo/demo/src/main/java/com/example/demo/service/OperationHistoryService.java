@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.OperationHistoryDto;
+import com.example.demo.dto.history.OperationHistoryDto;
 
 import java.util.List;
 

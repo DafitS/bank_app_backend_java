@@ -1,4 +1,4 @@
-package com.example.demo.exceptions;
+package com.example.demo.exceptions.custom;
 
 public class UserNotExistException extends ValidationException {
     public UserNotExistException(String message, String userName) {

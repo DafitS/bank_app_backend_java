@@ -1,11 +1,12 @@
 package com.example.demo.controller;
 
 
-import com.example.demo.dto.OperationHistoryDto;
+import com.example.demo.dto.history.OperationHistoryDto;
 import com.example.demo.service.OperationHistoryService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +25,7 @@ public class OperationHistoryController {
         this.operationHistoryService = operationHistoryService;
     }
 
+    @PreAuthorize("hasRole('STANDARD_USER')")
     @GetMapping("/{accountId}/history")
     public ResponseEntity<List<OperationHistoryDto>> getAccountHistory(@PathVariable Long accountId)
     {

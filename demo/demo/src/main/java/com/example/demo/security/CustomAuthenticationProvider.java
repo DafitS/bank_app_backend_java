@@ -13,6 +13,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -29,14 +30,16 @@ import java.util.UUID;
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     private final UserRepository userRepository;
-
+    private final PasswordEncoder passwordEncoder;
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String email = authentication.getName();
         String credential = authentication.getCredentials().toString();
         Optional<User> maybeUser = userRepository.findByEmail(email);
         if (maybeUser.isPresent()) {
-            if (credential.equals(maybeUser.get().getPassword())) {
+            if(passwordEncoder.matches(authentication.getCredentials().toString(), maybeUser.get().getPassword()))
+            {
+           /* if (credential.equals(maybeUser.get().getPassword())) {*/
                 return new UsernamePasswordAuthenticationToken(maybeUser.get(), credential, new LinkedList<>());
             }
         }
@@ -50,7 +53,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         Instant now = Instant.now();
         SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
         return Jwts.builder().setId(UUID.randomUUID().toString()).setSubject(username).claim("email", email).setIssuedAt(Date.from(now))
-                .setExpiration(Date.from(now.plus(jwtExpirationInSeconds, ChronoUnit.SECONDS))).signWith(key, SignatureAlgorithm.HS256).compact();
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationInSeconds)).signWith(key, SignatureAlgorithm.HS256).compact();
     }
 
     public Claims validateAndGetClaims(String token) {

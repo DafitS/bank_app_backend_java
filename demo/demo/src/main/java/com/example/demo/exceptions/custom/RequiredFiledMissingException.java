@@ -1,4 +1,4 @@
-package com.example.demo.exceptions;
+package com.example.demo.exceptions.custom;
 
 public class RequiredFiledMissingException extends ValidationException {
     public RequiredFiledMissingException(String message) {

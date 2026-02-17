@@ -1,24 +1,24 @@
 package com.example.demo.mapper;
 
-import com.example.demo.dto.TransactionDto;
+import com.example.demo.dto.transaction.TransactionCreateDto;
+import com.example.demo.dto.transaction.TransactionResponseDto;
 import com.example.demo.entity.Transaction;
 
 public class TransactionMapper {
 
-    public static Transaction mapToTransaction(TransactionDto dto)
+    public static Transaction mapToTransaction(TransactionCreateDto dto)
     {
-        return new Transaction(
-                dto.getId(),
-                dto.getAccountFrom(),
-                dto.getAccountTo(),
-                dto.getAmount(),
-                dto.getCreatedAt()
-        );
+        Transaction transaction = new Transaction();
+        transaction.setAccountFrom(dto.getAccountFrom());
+        transaction.setAccountTo(dto.getAccountTo());
+        transaction.setAmount(dto.getAmount());
+
+        return transaction;
     }
 
-    public static TransactionDto mapToTransactionDto(Transaction transaction)
+    public static TransactionResponseDto mapToTransactionResponseDto(Transaction transaction)
     {
-        return new TransactionDto(
+        return new TransactionResponseDto(
                 transaction.getId(),
                 transaction.getAccountFrom(),
                 transaction.getAccountTo(),

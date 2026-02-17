@@ -4,25 +4,25 @@ import com.example.demo.dto.user.UserCreateDto;
 import com.example.demo.dto.user.UserResponseDto;
 import com.example.demo.dto.user.UserUpdateDto;
 import com.example.demo.entity.User;
-import com.example.demo.exceptions.UserNotExistExceptionById;
+import com.example.demo.exceptions.custom.UserNotExistExceptionById;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepository;
-
-    public UserServiceImpl(UserRepository userRepository)
-    {
-        this.userRepository = userRepository;
-    }
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserResponseDto createUser(UserCreateDto userCreateDto) {
         User user = UserMapper.mapToUser(userCreateDto);
+        user.setPassword(passwordEncoder.encode(userCreateDto.getPassword()));
         User savedUser = userRepository.save(user);
 
         return UserMapper.mapToUserResponseDto(savedUser);

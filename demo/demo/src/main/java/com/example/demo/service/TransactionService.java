@@ -1,11 +1,11 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.TransactionDto;
-import com.example.demo.entity.Transaction;
+import com.example.demo.dto.transaction.TransactionCreateDto;
+import com.example.demo.dto.transaction.TransactionResponseDto;
 
 public interface TransactionService {
 
-    TransactionDto createTransaction(TransactionDto transactionDto);
+    TransactionResponseDto createTransaction(TransactionCreateDto transactionCreateDto);
 
-    TransactionDto getTransactionById(Long id);
+    TransactionResponseDto getTransactionById(Long id);
 }

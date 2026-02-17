@@ -1,23 +1,20 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.dto.TransactionDto;
+import com.example.demo.dto.transaction.TransactionCreateDto;
+import com.example.demo.dto.transaction.TransactionResponseDto;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.OperationHistory;
 import com.example.demo.entity.Transaction;
-import com.example.demo.entity.User;
-import com.example.demo.exceptions.AccountNotExistException;
-import com.example.demo.exceptions.AccountNumberNotExistException;
-import com.example.demo.exceptions.InvalidArgumentException;
-import com.example.demo.exceptions.TransactionNotExistException;
+import com.example.demo.exceptions.custom.AccountNumberNotExistException;
+import com.example.demo.exceptions.custom.InvalidArgumentException;
+import com.example.demo.exceptions.custom.TransactionNotExistException;
 import com.example.demo.mapper.TransactionMapper;
-import com.example.demo.mapper.UserMapper;
 import com.example.demo.option.OperationType;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.OperationHistoryRepository;
 import com.example.demo.repository.TransactionRepository;
 import com.example.demo.service.TransactionService;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.Null;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -38,36 +35,36 @@ public class TransactionServiceImpl implements TransactionService {
 
 
     @Override
-    public TransactionDto getTransactionById(Long id) {
+    public TransactionResponseDto getTransactionById(Long id) {
         Transaction transaction= transactionRepository
                 .findById(id)
                 .orElseThrow(() ->  new TransactionNotExistException("Transaction not found", id));
-        return TransactionMapper.mapToTransactionDto(transaction);
+        return TransactionMapper.mapToTransactionResponseDto(transaction);
     }
 
     @Override
     @Transactional
-    public TransactionDto createTransaction(TransactionDto transactionDto) {
-        if(transactionDto.getAmount() == null || transactionDto.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+    public TransactionResponseDto createTransaction(TransactionCreateDto transactionCreateDto) {
+        if(transactionCreateDto.getAmount() == null || transactionCreateDto.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new InvalidArgumentException("Amount must be positive");
         }
 
-        if(transactionDto.getAccountFrom().equals(transactionDto.getAccountTo())) {
+        if(transactionCreateDto.getAccountFrom().equals(transactionCreateDto.getAccountTo())) {
             throw new InvalidArgumentException("Sender and receiver accounts must be different");
         }
 
-        Account sender = accountRepository.findByAccountNumber(transactionDto.getAccountFrom())
-                .orElseThrow(() -> new AccountNumberNotExistException("Sender account not found", transactionDto.getAccountFrom()));
+        Account sender = accountRepository.findByAccountNumber(transactionCreateDto.getAccountFrom())
+                .orElseThrow(() -> new AccountNumberNotExistException("Sender account not found", transactionCreateDto.getAccountFrom()));
 
-        Account receiver = accountRepository.findByAccountNumber(transactionDto.getAccountTo())
-                .orElseThrow(() -> new AccountNumberNotExistException("Receiver account not found", transactionDto.getAccountTo()));
+        Account receiver = accountRepository.findByAccountNumber(transactionCreateDto.getAccountTo())
+                .orElseThrow(() -> new AccountNumberNotExistException("Receiver account not found", transactionCreateDto.getAccountTo()));
 
-        if(sender.getAmount().compareTo(transactionDto.getAmount()) < 0) {
+        if(sender.getAmount().compareTo(transactionCreateDto.getAmount()) < 0) {
             throw new InvalidArgumentException("Insufficient funds in sender account");
         }
 
-        sender.setAmount(sender.getAmount().subtract(transactionDto.getAmount()));
-        receiver.setAmount(receiver.getAmount().add(transactionDto.getAmount()));
+        sender.setAmount(sender.getAmount().subtract(transactionCreateDto.getAmount()));
+        receiver.setAmount(receiver.getAmount().add(transactionCreateDto.getAmount()));
 
         accountRepository.save(sender);
         accountRepository.save(receiver);
@@ -76,7 +73,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         senderHistory.setAccount(sender);
         senderHistory.setOperationType(OperationType.TRANSFER_OUT);
-        senderHistory.setAmount(transactionDto.getAmount());
+        senderHistory.setAmount(transactionCreateDto.getAmount());
         senderHistory.setBalanceAfter(sender.getAmount());
         senderHistory.setCreatedAt(LocalDateTime.now());
         senderHistory.setRelatedAccountNumber(receiver.getAccountNumber());
@@ -86,7 +83,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         recieverHistory.setAccount(receiver);
         recieverHistory.setOperationType(OperationType.TRANSFER_IN);
-        recieverHistory.setAmount(transactionDto.getAmount());
+        recieverHistory.setAmount(transactionCreateDto.getAmount());
         recieverHistory.setBalanceAfter(receiver.getAmount());
         recieverHistory.setCreatedAt(LocalDateTime.now());
         recieverHistory.setRelatedAccountNumber(sender.getAccountNumber());
@@ -95,10 +92,10 @@ public class TransactionServiceImpl implements TransactionService {
 
 
 
-        Transaction transaction = TransactionMapper.mapToTransaction(transactionDto);
+        Transaction transaction = TransactionMapper.mapToTransaction(transactionCreateDto);
         Transaction savedTransaction = transactionRepository.save(transaction);
 
-        return TransactionMapper.mapToTransactionDto(savedTransaction);
+        return TransactionMapper.mapToTransactionResponseDto(savedTransaction);
     }
 
 }

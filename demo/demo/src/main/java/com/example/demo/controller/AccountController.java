@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,18 +32,21 @@ public class AccountController {
                 .body(accountService.createAccount(accountCreateDto));
     }
 
+    @PreAuthorize("hasRole('STANDARD_USER')")
     @GetMapping
     public ResponseEntity<List<AccountResponseDto>> getAllAccounts()
     {
         return new ResponseEntity<>(accountService.getAllAccounts(), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('STANDARD_USER')")
     @GetMapping("/{id}")
     public ResponseEntity<AccountResponseDto> getAccountById(@PathVariable Long id)
     {
         return ResponseEntity.ok(accountService.getAccountById(id));
     }
 
+    @PreAuthorize("hasRole('STANDARD_USER')")
     @PutMapping("/{id}/deposit")
     public ResponseEntity<AccountResponseDto> getAccountByIdToDeposit(@PathVariable Long id,  @Valid @RequestBody AmountDto amountDto)
     {
@@ -50,6 +54,7 @@ public class AccountController {
         return ResponseEntity.ok(accountResponseDto);
     }
 
+    @PreAuthorize("hasRole('STANDARD_USER')")
     @PutMapping("/{id}/withdraw")
     public ResponseEntity<AccountResponseDto> getAccountByIdToWithdraw(@PathVariable Long id,  @Valid @RequestBody AmountDto amountDto)
     {
@@ -57,6 +62,7 @@ public class AccountController {
         return ResponseEntity.ok(accountResponseDto);
     }
 
+    @PreAuthorize("hasRole('STANDARD_USER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> getAccountByIdToDelete(@PathVariable Long id)
     {

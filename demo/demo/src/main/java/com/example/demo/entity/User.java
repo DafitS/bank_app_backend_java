@@ -1,9 +1,11 @@
 package com.example.demo.entity;
 
+import com.example.demo.option.RoleType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
@@ -30,6 +32,9 @@ public class User implements UserDetails {
     private String password;
     @Column(name = "personal_id_number", unique = true, length = 11)
     private String pesel;
+    @Column(name = "role_type")
+    @Enumerated(EnumType.STRING)
+    private RoleType roleType;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -37,7 +42,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(new SimpleGrantedAuthority("ROLE_" + roleType));
     }
 
     @Override

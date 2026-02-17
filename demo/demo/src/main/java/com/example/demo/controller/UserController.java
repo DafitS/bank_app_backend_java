@@ -5,6 +5,7 @@ import com.example.demo.dto.user.UserResponseDto;
 import com.example.demo.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,11 +23,13 @@ public class UserController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('STANDARD_USER')")
     public ResponseEntity<UserResponseDto> addUser(@Valid @RequestBody UserCreateDto userCreateDto)
     {
         return new ResponseEntity<>(userService.createUser(userCreateDto), HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasRole('STANDARD_USER')")
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id)
     {
