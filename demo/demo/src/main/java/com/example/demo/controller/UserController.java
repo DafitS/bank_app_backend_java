@@ -23,13 +23,13 @@ public class UserController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('STANDARD_USER')")
+
     public ResponseEntity<UserResponseDto> addUser(@Valid @RequestBody UserCreateDto userCreateDto)
     {
         return new ResponseEntity<>(userService.createUser(userCreateDto), HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasRole('STANDARD_USER')")
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id)
     {

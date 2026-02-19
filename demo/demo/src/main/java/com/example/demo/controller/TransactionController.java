@@ -23,13 +23,12 @@ public class TransactionController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('STANDARD_USER')")
     public ResponseEntity<TransactionResponseDto> addTransaction(@Valid @RequestBody TransactionCreateDto transactionCreateDto)
     {
         return new ResponseEntity<>(transactionService.createTransaction(transactionCreateDto), HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasRole('STANDARD_USER')")
+    @PreAuthorize("hasRole('ADMINISTRATOR') or @transactionSecurity.isOwner(#id)")
     @GetMapping("/{id}")
     public ResponseEntity<TransactionResponseDto> getTransactionById(@PathVariable Long id)
     {

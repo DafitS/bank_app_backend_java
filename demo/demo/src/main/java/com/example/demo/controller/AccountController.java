@@ -32,21 +32,21 @@ public class AccountController {
                 .body(accountService.createAccount(accountCreateDto));
     }
 
-    @PreAuthorize("hasRole('STANDARD_USER')")
-    @GetMapping
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
+    @GetMapping("/all")
     public ResponseEntity<List<AccountResponseDto>> getAllAccounts()
     {
         return new ResponseEntity<>(accountService.getAllAccounts(), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('STANDARD_USER')")
+    @PreAuthorize("hasRole('ADMINISTRATOR') or @accountSecurity.isOwner(#id)")
     @GetMapping("/{id}")
     public ResponseEntity<AccountResponseDto> getAccountById(@PathVariable Long id)
     {
         return ResponseEntity.ok(accountService.getAccountById(id));
     }
 
-    @PreAuthorize("hasRole('STANDARD_USER')")
+    @PreAuthorize("hasRole('ADMINISTRATOR') or @accountSecurity.isOwner(#id)")
     @PutMapping("/{id}/deposit")
     public ResponseEntity<AccountResponseDto> getAccountByIdToDeposit(@PathVariable Long id,  @Valid @RequestBody AmountDto amountDto)
     {
@@ -54,7 +54,7 @@ public class AccountController {
         return ResponseEntity.ok(accountResponseDto);
     }
 
-    @PreAuthorize("hasRole('STANDARD_USER')")
+    @PreAuthorize("hasRole('ADMINISTRATOR') or @accountSecurity.isOwner(#id)")
     @PutMapping("/{id}/withdraw")
     public ResponseEntity<AccountResponseDto> getAccountByIdToWithdraw(@PathVariable Long id,  @Valid @RequestBody AmountDto amountDto)
     {
@@ -62,7 +62,7 @@ public class AccountController {
         return ResponseEntity.ok(accountResponseDto);
     }
 
-    @PreAuthorize("hasRole('STANDARD_USER')")
+    @PreAuthorize("hasRole('ADMINISTRATOR') or @accountSecurity.isOwner(#id)")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> getAccountByIdToDelete(@PathVariable Long id)
     {

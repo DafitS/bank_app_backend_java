@@ -5,16 +5,20 @@ import com.example.demo.dto.transaction.TransactionResponseDto;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.OperationHistory;
 import com.example.demo.entity.Transaction;
+import com.example.demo.entity.User;
 import com.example.demo.exceptions.custom.AccountNumberNotExistException;
 import com.example.demo.exceptions.custom.InvalidArgumentException;
 import com.example.demo.exceptions.custom.TransactionNotExistException;
 import com.example.demo.mapper.TransactionMapper;
 import com.example.demo.option.OperationType;
+import com.example.demo.option.RoleType;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.OperationHistoryRepository;
 import com.example.demo.repository.TransactionRepository;
 import com.example.demo.service.TransactionService;
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -53,8 +57,24 @@ public class TransactionServiceImpl implements TransactionService {
             throw new InvalidArgumentException("Sender and receiver accounts must be different");
         }
 
-        Account sender = accountRepository.findByAccountNumber(transactionCreateDto.getAccountFrom())
-                .orElseThrow(() -> new AccountNumberNotExistException("Sender account not found", transactionCreateDto.getAccountFrom()));
+        Account sender;
+        User currentUser = getCurrentUser();
+
+        if(currentUser.getRoleType() == RoleType.ADMINISTRATOR)
+        {
+            sender = accountRepository
+                    .findByAccountNumber(transactionCreateDto.getAccountFrom())
+                        .orElseThrow(() -> new AccountNumberNotExistException(
+                                "Sender account not found",
+                                transactionCreateDto.getAccountFrom()));
+        } else {
+            sender = accountRepository
+                    .findByAccountNumberAndUserId(transactionCreateDto.getAccountFrom(), currentUser.getId())
+                        .orElseThrow(() -> new AccountNumberNotExistException(
+                                "Sender account not found",
+                                transactionCreateDto.getAccountFrom()));
+        }
+
 
         Account receiver = accountRepository.findByAccountNumber(transactionCreateDto.getAccountTo())
                 .orElseThrow(() -> new AccountNumberNotExistException("Receiver account not found", transactionCreateDto.getAccountTo()));
@@ -92,10 +112,16 @@ public class TransactionServiceImpl implements TransactionService {
 
 
 
-        Transaction transaction = TransactionMapper.mapToTransaction(transactionCreateDto);
+        Transaction transaction = TransactionMapper.mapToTransaction(transactionCreateDto, sender);
         Transaction savedTransaction = transactionRepository.save(transaction);
 
         return TransactionMapper.mapToTransactionResponseDto(savedTransaction);
+    }
+
+    private User getCurrentUser()
+    {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (User) authentication.getPrincipal();
     }
 
 }

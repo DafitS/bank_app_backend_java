@@ -11,10 +11,14 @@ import com.example.demo.exceptions.custom.RequiredFiledMissingException;
 import com.example.demo.exceptions.custom.UserNotExistException;
 import com.example.demo.mapper.AccountMapper;
 import com.example.demo.option.OperationType;
+import com.example.demo.option.RoleType;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.OperationHistoryRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.AccountService;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -82,6 +86,13 @@ public class AccountServiceImpl implements AccountService{
                 .findById(id)
                 .orElseThrow(()->new AccountNotExistException("Account not Found!", id));
 
+        User currentUser = getCurrentUser();
+
+        if (!account.getUser().getId().equals(currentUser.getId())
+                && currentUser.getRoleType() != RoleType.ADMINISTRATOR) {
+            throw new AccessDeniedException("You cannot deposit from this account");
+        }
+
         account.setAmount(account.getAmount().add(amount));
         Account saveAccount = accountRepository.save(account);
 
@@ -106,6 +117,13 @@ public class AccountServiceImpl implements AccountService{
         Account account = accountRepository
                 .findById(id)
                 .orElseThrow(()-> new AccountNotExistException("Account not Found!", id));
+
+        User currentUser = getCurrentUser();
+
+        if (!account.getUser().getId().equals(currentUser.getId())
+                && currentUser.getRoleType() != RoleType.ADMINISTRATOR) {
+            throw new AccessDeniedException("You cannot withdraw from this account");
+        }
 
         if (account.getAmount().compareTo(amount) < 0) {
             throw new InvalidArgumentException("No funds to withdraw!");
@@ -141,6 +159,13 @@ public class AccountServiceImpl implements AccountService{
 
          accountRepository.deleteById(id);
     }
+
+    private User getCurrentUser() {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+        return (User) authentication.getPrincipal();
+    }
+
 }
 
 

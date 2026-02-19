@@ -39,7 +39,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         if (maybeUser.isPresent()) {
             if(passwordEncoder.matches(authentication.getCredentials().toString(), maybeUser.get().getPassword()))
             {
-           /* if (credential.equals(maybeUser.get().getPassword())) {*/
                 return new UsernamePasswordAuthenticationToken(maybeUser.get(), credential, new LinkedList<>());
             }
         }
