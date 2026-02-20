@@ -5,10 +5,7 @@ import com.example.demo.dto.account.AccountResponseDto;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.OperationHistory;
 import com.example.demo.entity.User;
-import com.example.demo.exceptions.custom.AccountNotExistException;
-import com.example.demo.exceptions.custom.InvalidArgumentException;
-import com.example.demo.exceptions.custom.RequiredFiledMissingException;
-import com.example.demo.exceptions.custom.UserNotExistException;
+import com.example.demo.exceptions.custom.*;
 import com.example.demo.mapper.AccountMapper;
 import com.example.demo.option.OperationType;
 import com.example.demo.option.RoleType;
@@ -16,6 +13,7 @@ import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.OperationHistoryRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.AccountService;
+import jakarta.transaction.Transactional;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -76,6 +74,7 @@ public class AccountServiceImpl implements AccountService{
         return AccountMapper.mapToAccountResponseDto(account);
     }
 
+    @Transactional
     @Override
     public AccountResponseDto deposit(Long id, BigDecimal amount) {
 
@@ -85,6 +84,11 @@ public class AccountServiceImpl implements AccountService{
         Account account = accountRepository
                 .findById(id)
                 .orElseThrow(()->new AccountNotExistException("Account not Found!", id));
+
+        if(!account.isActive())
+        {
+            throw new AccountNotActiveException("Account is Disabled!");
+        }
 
         User currentUser = getCurrentUser();
 
@@ -108,6 +112,7 @@ public class AccountServiceImpl implements AccountService{
         return AccountMapper.mapToAccountResponseDto(saveAccount);
     }
 
+    @Transactional
     @Override
     public AccountResponseDto withdraw(Long id, BigDecimal amount) {
 
@@ -118,6 +123,10 @@ public class AccountServiceImpl implements AccountService{
                 .findById(id)
                 .orElseThrow(()-> new AccountNotExistException("Account not Found!", id));
 
+        if(!account.isActive())
+        {
+            throw new AccountNotActiveException("Account is Disabled!");
+        }
         User currentUser = getCurrentUser();
 
         if (!account.getUser().getId().equals(currentUser.getId())
@@ -154,10 +163,21 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
-    public void deleteAccountById(Long id) {
-        if(!accountRepository.existsById(id)) throw new AccountNotExistException("Account not Found!", id);
+    public void closeAccountById(Long id) {
+        Account account = accountRepository
+                .findById(id)
+                .orElseThrow(() -> new AccountNotExistException("Account not Found!", id));
 
-         accountRepository.deleteById(id);
+        if(account.getAmount().compareTo(BigDecimal.ZERO) > 0)
+        {
+            throw new InvalidArgumentException("Cannot close account with balance > 0");
+        }
+
+        account.setActive(false);
+        account.setClosedAt(LocalDateTime.now());
+        accountRepository.save(account);
+
+
     }
 
     private User getCurrentUser() {

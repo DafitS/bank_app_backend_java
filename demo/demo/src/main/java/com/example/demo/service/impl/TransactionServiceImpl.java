@@ -6,6 +6,7 @@ import com.example.demo.entity.Account;
 import com.example.demo.entity.OperationHistory;
 import com.example.demo.entity.Transaction;
 import com.example.demo.entity.User;
+import com.example.demo.exceptions.custom.AccountNotActiveException;
 import com.example.demo.exceptions.custom.AccountNumberNotExistException;
 import com.example.demo.exceptions.custom.InvalidArgumentException;
 import com.example.demo.exceptions.custom.TransactionNotExistException;
@@ -75,9 +76,18 @@ public class TransactionServiceImpl implements TransactionService {
                                 transactionCreateDto.getAccountFrom()));
         }
 
+        if(!sender.isActive())
+        {
+            throw new AccountNotActiveException("Account is disabled!");
+        }
 
         Account receiver = accountRepository.findByAccountNumber(transactionCreateDto.getAccountTo())
                 .orElseThrow(() -> new AccountNumberNotExistException("Receiver account not found", transactionCreateDto.getAccountTo()));
+
+        if(!receiver.isActive())
+        {
+            throw new AccountNotActiveException("Something wrong error!");
+        }
 
         if(sender.getAmount().compareTo(transactionCreateDto.getAmount()) < 0) {
             throw new InvalidArgumentException("Insufficient funds in sender account");
@@ -99,16 +109,16 @@ public class TransactionServiceImpl implements TransactionService {
         senderHistory.setRelatedAccountNumber(receiver.getAccountNumber());
         operationHistoryRepository.save(senderHistory);
 
-        OperationHistory recieverHistory = new OperationHistory();
+        OperationHistory receiverHistory = new OperationHistory();
 
-        recieverHistory.setAccount(receiver);
-        recieverHistory.setOperationType(OperationType.TRANSFER_IN);
-        recieverHistory.setAmount(transactionCreateDto.getAmount());
-        recieverHistory.setBalanceAfter(receiver.getAmount());
-        recieverHistory.setCreatedAt(LocalDateTime.now());
-        recieverHistory.setRelatedAccountNumber(sender.getAccountNumber());
+        receiverHistory.setAccount(receiver);
+        receiverHistory.setOperationType(OperationType.TRANSFER_IN);
+        receiverHistory.setAmount(transactionCreateDto.getAmount());
+        receiverHistory.setBalanceAfter(receiver.getAmount());
+        receiverHistory.setCreatedAt(LocalDateTime.now());
+        receiverHistory.setRelatedAccountNumber(sender.getAccountNumber());
 
-        operationHistoryRepository.save(recieverHistory);
+        operationHistoryRepository.save(receiverHistory);
 
 
 

@@ -63,11 +63,11 @@ public class AccountController {
     }
 
     @PreAuthorize("hasRole('ADMINISTRATOR') or @accountSecurity.isOwner(#id)")
-    @DeleteMapping("/{id}")
+    @PutMapping("/{id}/disable")
     public ResponseEntity<String> getAccountByIdToDelete(@PathVariable Long id)
     {
-        accountService.deleteAccountById(id);
-        return ResponseEntity.ok("Konto zostało usuniete pomyślnie!");
+        accountService.closeAccountById(id);
+        return ResponseEntity.ok("Konto zostało wyłączone pomyślnie!");
 
     }
 }
