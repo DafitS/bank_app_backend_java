@@ -30,7 +30,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             InvalidArgumentException.class,
             RequiredFiledMissingException.class,
-            ValidationException.class
+            ValidationException.class,
+            AccountNotActiveException.class
     })
     public ResponseEntity<String> handleBadRequest(RuntimeException ex) {
 
@@ -57,6 +58,13 @@ public class GlobalExceptionHandler {
                 .orElse("Validation error");
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<String> handleIllegalState(IllegalStateException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ex.getMessage());
     }
 
     @ExceptionHandler(AccessDeniedException.class)

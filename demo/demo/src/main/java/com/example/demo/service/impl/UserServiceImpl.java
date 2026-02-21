@@ -4,11 +4,15 @@ import com.example.demo.dto.user.UserCreateDto;
 import com.example.demo.dto.user.UserResponseDto;
 import com.example.demo.dto.user.UserUpdateDto;
 import com.example.demo.entity.User;
+import com.example.demo.exceptions.custom.UserNotExistException;
 import com.example.demo.exceptions.custom.UserNotExistExceptionById;
 import com.example.demo.mapper.UserMapper;
+import com.example.demo.option.RoleType;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -53,10 +57,30 @@ public class UserServiceImpl implements UserService {
         if (dto.getName() != null) user.setName(dto.getName());
         if (dto.getSurname() != null) user.setSurname(dto.getSurname());
         if (dto.getEmail() != null) user.setEmail(dto.getEmail());
-        if (dto.getPassword() != null) user.setPassword(dto.getPassword());
+        if (dto.getPassword() != null && !dto.getPassword().isBlank()) user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         User savedUser = userRepository.save(user);
         return UserMapper.mapToUserResponseDto(savedUser);
+    }
+
+    @Override
+    public void changeUserRole(Long id, RoleType roleType) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserEmail = authentication.getName();
+
+        User currentUser = userRepository.findByEmail(currentUserEmail)
+                .orElseThrow(()-> new UserNotExistException("Current user not found", currentUserEmail));
+        if(currentUser.getId().equals(id) && roleType != RoleType.ADMINISTRATOR)
+        {
+            throw new IllegalStateException("Admin cannot remove own administrator role");
+        }
+
+        User userChange = userRepository.findById(id)
+                .orElseThrow(()-> new UserNotExistExceptionById("Current user not found", id));
+        userChange.setRoleType(roleType);
+
+        userRepository.save(userChange);
+
     }
 
     @Override

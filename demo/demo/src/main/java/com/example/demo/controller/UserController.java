@@ -1,9 +1,12 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.user.UserChangeRoleDto;
 import com.example.demo.dto.user.UserCreateDto;
 import com.example.demo.dto.user.UserResponseDto;
+import com.example.demo.option.RoleType;
 import com.example.demo.service.UserService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -42,4 +45,13 @@ public class UserController {
         String email = auth.getName();
         return ResponseEntity.ok(userService.getUserByEmail(email));
     }
+
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
+    @PutMapping("/{id}/role")
+    public ResponseEntity<UserResponseDto> changeRole(@PathVariable Long id, @RequestBody UserChangeRoleDto userChangeRoleDto)
+    {
+        userService.changeUserRole(id, userChangeRoleDto.getRoleType());
+        return ResponseEntity.noContent().build();
+    }
+
 }
