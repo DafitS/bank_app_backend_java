@@ -1,4 +1,4 @@
-package com.example.demo.security;
+package com.example.demo.security.domain;
 
 import com.example.demo.entity.User;
 import com.example.demo.repository.AccountRepository;
@@ -12,15 +12,12 @@ import org.springframework.stereotype.Component;
 public class AccountSecurity {
     private final AccountRepository accountRepository;
 
-    public boolean isOwner(Long accountId)
-    {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        User currentUser = (User) authentication.getPrincipal();
+    public boolean isOwner(Long accountId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) auth.getPrincipal();
 
         return accountRepository.findById(accountId)
-                .map(account ->
-                        account.getUser().getId().equals(currentUser.getId()))
-                            .orElse(false);
+                .map(account -> account.getUser().getId().equals(currentUser.getId()))
+                .orElse(false);
     }
 }

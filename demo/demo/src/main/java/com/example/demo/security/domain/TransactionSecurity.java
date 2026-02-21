@@ -1,4 +1,4 @@
-package com.example.demo.security;
+package com.example.demo.security.domain;
 
 import com.example.demo.entity.User;
 import com.example.demo.option.RoleType;

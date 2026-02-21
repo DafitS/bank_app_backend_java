@@ -25,7 +25,7 @@ public class OperationHistoryController {
         this.operationHistoryService = operationHistoryService;
     }
 
-    @PreAuthorize("hasRole('STANDARD_USER')")
+    @PreAuthorize("hasRole('ADMINISTRATOR') or hasRole('CUSTOMER_SERVICE') or @accountSecurity.isOwner(#accountId)")
     @GetMapping("/{accountId}/history")
     public ResponseEntity<List<OperationHistoryDto>> getAccountHistory(@PathVariable Long accountId)
     {

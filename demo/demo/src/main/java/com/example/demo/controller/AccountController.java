@@ -32,14 +32,14 @@ public class AccountController {
                 .body(accountService.createAccount(accountCreateDto));
     }
 
-    @PreAuthorize("hasRole('ADMINISTRATOR')")
+    @PreAuthorize("hasRole('ADMINISTRATOR') or hasRole('CUSTOMER_SERVICE')")
     @GetMapping("/all")
     public ResponseEntity<List<AccountResponseDto>> getAllAccounts()
     {
         return new ResponseEntity<>(accountService.getAllAccounts(), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMINISTRATOR') or @accountSecurity.isOwner(#id)")
+    @PreAuthorize("hasRole('ADMINISTRATOR') or hasRole('CUSTOMER_SERVICE') or @accountSecurity.isOwner(#id)")
     @GetMapping("/{id}")
     public ResponseEntity<AccountResponseDto> getAccountById(@PathVariable Long id)
     {

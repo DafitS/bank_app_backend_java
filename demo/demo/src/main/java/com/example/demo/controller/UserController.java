@@ -3,10 +3,8 @@ package com.example.demo.controller;
 import com.example.demo.dto.user.UserChangeRoleDto;
 import com.example.demo.dto.user.UserCreateDto;
 import com.example.demo.dto.user.UserResponseDto;
-import com.example.demo.option.RoleType;
 import com.example.demo.service.UserService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -18,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
-    private UserService userService;
+    private final UserService userService;
 
     public UserController(UserService userService)
     {
@@ -32,7 +30,7 @@ public class UserController {
         return new ResponseEntity<>(userService.createUser(userCreateDto), HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasRole('ADMINISTRATOR')")
+    @PreAuthorize("hasRole('ADMINISTRATOR') or hasRole('CUSTOMER_SERVICE') or @userSecurity.isOwner(#id)")
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id)
     {
