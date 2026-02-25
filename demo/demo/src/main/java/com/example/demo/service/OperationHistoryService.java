@@ -7,4 +7,6 @@ import java.util.List;
 public interface OperationHistoryService {
 
     List<OperationHistoryDto> getHistoryByAccountId(Long accountId);
+
+    OperationHistoryDto assignType(Long operationId, Long typeId);
 }

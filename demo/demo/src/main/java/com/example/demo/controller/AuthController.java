@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.entity.LoginRequest;
+import com.example.demo.dto.utility.LoginRequest;
 import com.example.demo.entity.User;
 import com.example.demo.security.CustomAuthenticationProvider;
 import lombok.RequiredArgsConstructor;

@@ -1,5 +1,6 @@
 package com.example.demo.dto.history;
 
+import com.example.demo.dto.type.ExpenseResponseDto;
 import com.example.demo.option.OperationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,4 +21,5 @@ public class OperationHistoryDto {
 
     private String relatedAccountNumber;
 
+    private ExpenseResponseDto expenseType;
 }

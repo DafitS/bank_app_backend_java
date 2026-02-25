@@ -34,4 +34,8 @@ public class OperationHistory {
     private Account account;
 
     private String relatedAccountNumber;
+
+    @ManyToOne
+    @JoinColumn(name = "expense_type_id")
+    private ExpenseType expenseType;
 }

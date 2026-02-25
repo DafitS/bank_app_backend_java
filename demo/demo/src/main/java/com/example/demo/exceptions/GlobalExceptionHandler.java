@@ -19,7 +19,9 @@ public class GlobalExceptionHandler {
             UserNotExistExceptionById.class,
             AccountNotExistException.class,
             AccountNumberNotExistException.class,
-            TransactionNotExistException.class
+            TransactionNotExistException.class,
+            TypeNotFound.class
+
     })
     public ResponseEntity<String> handleNotFound(RuntimeException ex) {
         return ResponseEntity
@@ -31,7 +33,8 @@ public class GlobalExceptionHandler {
             InvalidArgumentException.class,
             RequiredFiledMissingException.class,
             ValidationException.class,
-            AccountNotActiveException.class
+            AccountNotActiveException.class,
+            DuplicateError.class
     })
     public ResponseEntity<String> handleBadRequest(RuntimeException ex) {
 

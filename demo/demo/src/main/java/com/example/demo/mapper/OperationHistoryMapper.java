@@ -13,6 +13,9 @@ public class OperationHistoryMapper {
         dto.setBalanceAfter(history.getBalanceAfter());
         dto.setCreatedAt(history.getCreatedAt());
         dto.setRelatedAccountNumber(history.getRelatedAccountNumber());
+        if(history.getExpenseType() != null){
+            dto.setExpenseType(ExpenseMapper.mapToOperationExpenseResponseDto(history.getExpenseType()));
+        }
         return dto;
     }
 }

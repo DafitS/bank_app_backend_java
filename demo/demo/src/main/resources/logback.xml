@@ -2,6 +2,16 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    <appender name="FILE_AUDIT_LOG" class="ch.qos.logback.core.FileAppender">
+        <file>C:\Users\OGMW3\Downloads\projekt bank\demo\demo\Audit.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <logger name="AUDITLOG" level="info" additivity="false">
+        <appender-ref ref="FILE_AUDIT_LOG"/>
+    </logger>
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
     </root>

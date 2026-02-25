@@ -1,8 +1,10 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.dto.history.OperationHistoryDto;
+import com.example.demo.entity.ExpenseType;
 import com.example.demo.entity.OperationHistory;
 import com.example.demo.mapper.OperationHistoryMapper;
+import com.example.demo.repository.ExpenseTypeRepository;
 import com.example.demo.repository.OperationHistoryRepository;
 import com.example.demo.service.OperationHistoryService;
 import org.springframework.stereotype.Service;
@@ -14,10 +16,12 @@ import java.util.stream.Collectors;
 public class OperationHistoryServiceImpl implements OperationHistoryService{
 
     private final OperationHistoryRepository historyRepository;
+    private final ExpenseTypeRepository expenseTypeRepository;
 
-    public OperationHistoryServiceImpl(OperationHistoryRepository historyRepository)
+    public OperationHistoryServiceImpl(OperationHistoryRepository historyRepository, ExpenseTypeRepository expenseTypeRepository)
     {
         this.historyRepository = historyRepository;
+        this.expenseTypeRepository = expenseTypeRepository;
     }
 
 
@@ -27,5 +31,19 @@ public class OperationHistoryServiceImpl implements OperationHistoryService{
 
         return histories.stream().map((history) -> OperationHistoryMapper.mapToOperationHistoryDto(history))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public OperationHistoryDto assignType(Long operationId, Long typeId) {
+        OperationHistory operation = historyRepository.findById(operationId)
+                .orElseThrow(() -> new RuntimeException("Operation not found"));
+
+        ExpenseType type = expenseTypeRepository.findById(typeId)
+                .orElseThrow(() -> new RuntimeException("Expense type not found"));
+
+        operation.setExpenseType(type);
+        historyRepository.save(operation);
+
+        return OperationHistoryMapper.mapToOperationHistoryDto(operation);
     }
 }
