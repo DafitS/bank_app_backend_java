@@ -14,4 +14,5 @@ public class UserResponseDto {
     private String surname;
     private String email;
     private String pesel;
+    private UserAddressDto userAddress;
 }

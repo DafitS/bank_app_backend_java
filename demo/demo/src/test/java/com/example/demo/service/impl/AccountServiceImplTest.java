@@ -164,6 +164,7 @@ class AccountServiceImplTest {
 
     @Test
     void shouldThrowWhenAccountNotActive() {
+        //Given
         AccountRepository accountRepository = mock(AccountRepository.class);
         UserRepository userRepository = mock(UserRepository.class);
         OperationHistoryRepository historyRepository = mock(OperationHistoryRepository.class);
@@ -180,10 +181,14 @@ class AccountServiceImplTest {
         when(auth.getPrincipal()).thenReturn(user);
         SecurityContextHolder.getContext().setAuthentication(auth);
 
+        //When
         when(accountRepository.findById(1L)).thenReturn(Optional.of(account));
 
+        //Then
         assertThrows(AccountNotActiveException.class,
                 () -> accountService.deposit(1L, new BigDecimal("100")));
+
+        verify(accountRepository, times(1)).findById(eq(1L));
     }
 
 }

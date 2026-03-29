@@ -31,5 +31,7 @@ public class UserCreateDto {
     @Pattern(regexp = "\\d{11}", message = "PESEL musi mieć 11 cyfr")
     private String pesel;
 
+    private UserAddressDto userAddress;
+
     private RoleType roleType;
 }
