@@ -1,6 +1,7 @@
 package com.example.demo.dto.user;
 
 import com.example.demo.option.RoleType;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -31,6 +32,7 @@ public class UserCreateDto {
     @Pattern(regexp = "\\d{11}", message = "PESEL musi mieć 11 cyfr")
     private String pesel;
 
+    @Valid
     private UserAddressDto userAddress;
 
     private RoleType roleType;

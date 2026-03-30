@@ -11,7 +11,7 @@ import java.util.List;
 
 public class UserMapper {
 
-    private static UserAddressDto mapToUserAddressDto(Address address) {
+    public static UserAddressDto mapToUserAddressDto(Address address) {
         if (address == null) return null;
         UserAddressDto dto = new UserAddressDto();
         dto.setStreet(address.getStreet());
