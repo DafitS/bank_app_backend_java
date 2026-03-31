@@ -1,6 +1,11 @@
 package com.example.demo.exceptions;
 
 import com.example.demo.exceptions.custom.*;
+import com.example.demo.exceptions.custom.account.AccountNotActiveException;
+import com.example.demo.exceptions.custom.account.AccountNotExistException;
+import com.example.demo.exceptions.custom.account.AccountNumberNotExistException;
+import com.example.demo.exceptions.custom.address.UserNotExistException;
+import com.example.demo.exceptions.custom.user.UserNotExistExceptionById;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

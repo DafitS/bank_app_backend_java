@@ -4,7 +4,7 @@ import com.example.demo.dto.user.UserAddressDto;
 import com.example.demo.dto.user.UserResponseDto;
 import com.example.demo.entity.Address;
 import com.example.demo.entity.User;
-import com.example.demo.exceptions.custom.UserNotExistExceptionById;
+import com.example.demo.exceptions.custom.user.UserNotExistExceptionById;
 import com.example.demo.exceptions.custom.address.AddressNotExistException;
 import com.example.demo.mapper.AddressMapper;
 import com.example.demo.mapper.UserMapper;

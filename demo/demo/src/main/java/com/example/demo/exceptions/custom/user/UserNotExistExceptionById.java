@@ -1,4 +1,4 @@
-package com.example.demo.exceptions.custom;
+package com.example.demo.exceptions.custom.user;
 
 public class UserNotExistExceptionById extends RuntimeException {
     public UserNotExistExceptionById(String message, Long id) {

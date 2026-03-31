@@ -1,7 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.dto.utility.RaportResponseDto;
-import com.example.demo.exceptions.custom.AccountNotExistException;
+import com.example.demo.exceptions.custom.account.AccountNotExistException;
 import com.example.demo.option.OperationType;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.OperationHistoryRepository;

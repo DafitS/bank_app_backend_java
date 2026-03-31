@@ -1,4 +1,4 @@
-package com.example.demo.exceptions.custom;
+package com.example.demo.exceptions.custom.account;
 
 public class AccountNumberNotExistException extends RuntimeException {
 
