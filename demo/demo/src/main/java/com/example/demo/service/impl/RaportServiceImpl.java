@@ -1,15 +1,22 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.dto.history.OperationHistoryDto;
+import com.example.demo.dto.type.ExpenseResponseDto;
 import com.example.demo.dto.utility.RaportResponseDto;
+import com.example.demo.dto.utility.SummaryDto;
+import com.example.demo.entity.OperationHistory;
 import com.example.demo.exceptions.custom.account.AccountNotExistException;
 import com.example.demo.option.OperationType;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.OperationHistoryRepository;
 import com.example.demo.service.RaportService;
+import com.example.demo.service.report.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import java.time.LocalDateTime;
@@ -21,6 +28,16 @@ public class RaportServiceImpl implements RaportService {
 
     private final OperationHistoryRepository operationHistoryRepository;
     private  final AccountRepository accountRepository;
+
+    private ExpenseResponseDto mapExpense(OperationHistory op) {
+        if (op.getExpenseType() == null) return null;
+
+        return new ExpenseResponseDto(
+                op.getExpenseType().getId(),
+                op.getExpenseType().getName(),
+                op.getExpenseType().isActive()
+        );
+    }
 
     @Override
     public RaportResponseDto generateRaport(Long accountId, LocalDateTime dateFrom, LocalDateTime dateTo) {
@@ -42,19 +59,31 @@ public class RaportServiceImpl implements RaportService {
                 OperationType.TRANSFER_IN
         );
 
-        BigInteger expenses = operationHistoryRepository
-                .countTotalSumInPeriod(accountId, dateFrom, dateTo, expenseTypes);
+        SummaryDto summary = operationHistoryRepository.getSummary(accountId, dateFrom, dateTo, incomeTypes, expenseTypes);
 
-        BigInteger income = operationHistoryRepository
-                .countTotalSumInPeriod(accountId, dateFrom, dateTo, incomeTypes);
+        BigDecimal income = summary.getIncome() != null ? summary.getIncome() : BigDecimal.ZERO;
+        BigDecimal expenses = summary.getExpenses() != null ? summary.getExpenses() : BigDecimal.ZERO;
+        BigDecimal balance = income.subtract(expenses);
 
-        expenses = expenses != null ? expenses : BigInteger.ZERO;
-        income = income != null ? income : BigInteger.ZERO;
+        List<OperationHistory> operations = operationHistoryRepository.findAllByAccountIdAndCreatedAtBetween(accountId, dateFrom, dateTo);
 
-        BigInteger balance = income.subtract(expenses);
+        List<OperationHistoryDto> operationsDto = operations.stream()
+                .map(op -> new OperationHistoryDto(
+                        op.getOperationType(),
+                        op.getAmount(),
+                        op.getBalanceAfter(),
+                        op.getCreatedAt(),
+                        op.getRelatedAccountNumber(),
+                        mapExpense(op)
 
-        return new RaportResponseDto(income, expenses, balance);
 
+                ))
+                .toList();
+
+        RaportResponseDto responseDto = new RaportResponseDto(income, expenses, balance, operationsDto);
+
+        FileService.generateReportPdf(responseDto, "raport_finansowy.pdf");
+        return  responseDto;
     }
 
 }

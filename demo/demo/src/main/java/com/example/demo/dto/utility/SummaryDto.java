@@ -1,23 +1,14 @@
 package com.example.demo.dto.utility;
 
-
-import com.example.demo.dto.history.OperationHistoryDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class RaportResponseDto {
+public class SummaryDto {
 
     private BigDecimal income;
-
     private BigDecimal expenses;
-
-    private BigDecimal balance;
-
-    private List<OperationHistoryDto> operations;
-
 }

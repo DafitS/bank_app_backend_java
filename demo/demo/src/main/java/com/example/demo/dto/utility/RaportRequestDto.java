@@ -8,9 +8,6 @@ import java.time.LocalDateTime;
 @Data
 public class RaportRequestDto {
 
-    @NotNull(message = "Account ID cannot be null")
-    private Long accountId;
-
     @NotNull(message = "Date from cannot be null")
     private LocalDateTime dateFrom;
 

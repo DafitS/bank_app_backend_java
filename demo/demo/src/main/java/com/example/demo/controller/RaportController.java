@@ -7,10 +7,7 @@ import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Log4j2
 @RestController
@@ -22,14 +19,14 @@ public class RaportController {
     public RaportController(RaportService raportService) {
         this.raportService = raportService;
     }
-
     @PreAuthorize("hasRole('ADMINISTRATOR') or hasRole('CUSTOMER_SERVICE') or @accountSecurity.isOwner(#accountId)")
-    @PostMapping("/generate")
+    @PostMapping("/generate/{accountId}")
     public ResponseEntity<RaportResponseDto> generateFinancialReport(
+            @PathVariable Long accountId,
             @Valid @RequestBody RaportRequestDto dto
     ) {
         RaportResponseDto response = raportService.generateRaport(
-                dto.getAccountId(),
+                accountId,
                 dto.getDateFrom(),
                 dto.getDateTo()
         );
@@ -38,3 +35,4 @@ public class RaportController {
     }
 
 }
+
