@@ -5,6 +5,9 @@ import com.example.demo.dto.utility.RaportResponseDto;
 import com.example.demo.service.RaportService;
 import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -21,17 +24,23 @@ public class RaportController {
     }
     @PreAuthorize("hasRole('ADMINISTRATOR') or hasRole('CUSTOMER_SERVICE') or @accountSecurity.isOwner(#accountId)")
     @PostMapping("/generate/{accountId}")
-    public ResponseEntity<RaportResponseDto> generateFinancialReport(
+    public ResponseEntity<ByteArrayResource> generateFinancialReport(
             @PathVariable Long accountId,
             @Valid @RequestBody RaportRequestDto dto
     ) {
-        RaportResponseDto response = raportService.generateRaport(
+        byte[] reportBytes = raportService.generateRaport(
                 accountId,
                 dto.getDateFrom(),
                 dto.getDateTo()
         );
 
-        return ResponseEntity.ok(response);
+        ByteArrayResource resource = new ByteArrayResource(reportBytes);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=raport_finansowy.pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .contentLength(reportBytes.length)
+                .body(resource);
     }
 
 }

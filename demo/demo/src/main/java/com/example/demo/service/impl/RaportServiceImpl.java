@@ -2,8 +2,12 @@ package com.example.demo.service.impl;
 
 import com.example.demo.dto.history.OperationHistoryDto;
 import com.example.demo.dto.type.ExpenseResponseDto;
+import com.example.demo.dto.user.UserAddressDto;
+import com.example.demo.dto.user.UserResponseDto;
 import com.example.demo.dto.utility.RaportResponseDto;
 import com.example.demo.dto.utility.SummaryDto;
+import com.example.demo.entity.Account;
+import com.example.demo.entity.Address;
 import com.example.demo.entity.OperationHistory;
 import com.example.demo.exceptions.custom.account.AccountNotExistException;
 import com.example.demo.option.OperationType;
@@ -40,7 +44,7 @@ public class RaportServiceImpl implements RaportService {
     }
 
     @Override
-    public RaportResponseDto generateRaport(Long accountId, LocalDateTime dateFrom, LocalDateTime dateTo) {
+    public byte[] generateRaport(Long accountId, LocalDateTime dateFrom, LocalDateTime dateTo) {
 
         boolean isExist = accountRepository.existsById(accountId);
         if(!isExist)
@@ -48,6 +52,29 @@ public class RaportServiceImpl implements RaportService {
             throw new AccountNotExistException("Account not found.", accountId);
         }
 
+        UserResponseDto userResponseDto = accountRepository.findById(accountId)
+                .map(Account::getUser)
+                .map(user -> new UserResponseDto(
+                        user.getId(),
+                        user.getName(),
+                        user.getSurname(),
+                        user.getEmail(),
+                        user.getPesel(),
+                        user.getAddresses().stream()
+                                .filter(Address::getIsCurrent)
+                                .findFirst()
+                                .map(address -> new UserAddressDto(
+                                        address.getStreet(),
+                                        address.getBuildingNumber(),
+                                        address.getApartmentNumber(),
+                                        address.getCity(),
+                                        address.getPostalCode(),
+                                        address.getCountry()
+                                ))
+                                .orElse(null)
+
+                ))
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         List<OperationType> expenseTypes = List.of(
                 OperationType.WITHDRAW,
@@ -82,8 +109,7 @@ public class RaportServiceImpl implements RaportService {
 
         RaportResponseDto responseDto = new RaportResponseDto(income, expenses, balance, operationsDto);
 
-        FileService.generateReportPdf(responseDto, "raport_finansowy.pdf");
-        return  responseDto;
+        return FileService.generateReportPdf(responseDto, userResponseDto);
     }
 
 }
