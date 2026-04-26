@@ -10,7 +10,7 @@ import com.example.demo.exceptions.custom.account.AccountNotActiveException;
 import com.example.demo.exceptions.custom.account.AccountNumberNotExistException;
 import com.example.demo.exceptions.custom.InvalidArgumentException;
 import com.example.demo.exceptions.custom.TransactionNotExistException;
-import com.example.demo.mapper.TransactionMapper;
+import com.example.demo.mapper.TransactionsMapper;
 import com.example.demo.option.OperationType;
 import com.example.demo.option.RoleType;
 import com.example.demo.repository.AccountRepository;
@@ -18,6 +18,7 @@ import com.example.demo.repository.OperationHistoryRepository;
 import com.example.demo.repository.TransactionRepository;
 import com.example.demo.service.TransactionService;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -25,26 +26,20 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@RequiredArgsConstructor
 @Service
 public class TransactionServiceImpl implements TransactionService {
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
     private final OperationHistoryRepository operationHistoryRepository;
-
-    public TransactionServiceImpl(TransactionRepository transactionRepository, AccountRepository accountRepository, OperationHistoryRepository operationHistoryRepository)
-    {
-        this.transactionRepository = transactionRepository;
-        this.accountRepository = accountRepository;
-        this.operationHistoryRepository = operationHistoryRepository;
-    }
-
+    private final TransactionsMapper transactionsMapper;
 
     @Override
     public TransactionResponseDto getTransactionById(Long id) {
         Transaction transaction= transactionRepository
                 .findById(id)
                 .orElseThrow(() ->  new TransactionNotExistException("Transaction not found", id));
-        return TransactionMapper.mapToTransactionResponseDto(transaction);
+        return transactionsMapper.toDto(transaction);
     }
 
     @Override
@@ -122,10 +117,10 @@ public class TransactionServiceImpl implements TransactionService {
 
 
 
-        Transaction transaction = TransactionMapper.mapToTransaction(transactionCreateDto, sender);
+        Transaction transaction = transactionsMapper.toEntity(transactionCreateDto, sender);
         Transaction savedTransaction = transactionRepository.save(transaction);
 
-        return TransactionMapper.mapToTransactionResponseDto(savedTransaction);
+        return transactionsMapper.toDto(savedTransaction);
     }
 
     private User getCurrentUser()

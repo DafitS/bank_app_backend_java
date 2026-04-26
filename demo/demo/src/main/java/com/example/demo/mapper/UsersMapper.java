@@ -9,7 +9,6 @@ import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.control.MappingControl;
 
 @Mapper(componentModel = "spring", uses = AddressesMapper.class)
 public interface UsersMapper {

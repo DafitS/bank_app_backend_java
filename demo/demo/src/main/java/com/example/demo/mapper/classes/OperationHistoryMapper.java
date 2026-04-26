@@ -1,4 +1,4 @@
-package com.example.demo.mapper;
+package com.example.demo.mapper.classes;
 
 import com.example.demo.dto.history.OperationHistoryDto;
 import com.example.demo.entity.OperationHistory;

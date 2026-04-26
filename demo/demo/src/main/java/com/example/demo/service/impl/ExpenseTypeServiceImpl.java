@@ -5,7 +5,7 @@ import com.example.demo.dto.type.ExpenseResponseDto;
 import com.example.demo.entity.ExpenseType;
 import com.example.demo.exceptions.custom.DuplicateError;
 import com.example.demo.exceptions.custom.TypeNotFound;
-import com.example.demo.mapper.ExpenseMapper;
+import com.example.demo.mapper.classes.ExpenseMapper;
 import com.example.demo.repository.ExpenseTypeRepository;
 import com.example.demo.service.ExpenseTypeService;
 import jakarta.transaction.Transactional;

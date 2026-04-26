@@ -3,7 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.dto.type.ExpenseCreateDto;
 import com.example.demo.dto.type.ExpenseResponseDto;
 import com.example.demo.entity.ExpenseType;
-import com.example.demo.mapper.ExpenseMapper;
+import com.example.demo.mapper.classes.ExpenseMapper;
 import com.example.demo.service.ExpenseTypeService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

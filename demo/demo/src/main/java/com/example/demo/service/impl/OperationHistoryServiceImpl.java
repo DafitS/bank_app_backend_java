@@ -3,7 +3,7 @@ package com.example.demo.service.impl;
 import com.example.demo.dto.history.OperationHistoryDto;
 import com.example.demo.entity.ExpenseType;
 import com.example.demo.entity.OperationHistory;
-import com.example.demo.mapper.OperationHistoryMapper;
+import com.example.demo.mapper.classes.OperationHistoryMapper;
 import com.example.demo.repository.ExpenseTypeRepository;
 import com.example.demo.repository.OperationHistoryRepository;
 import com.example.demo.service.OperationHistoryService;

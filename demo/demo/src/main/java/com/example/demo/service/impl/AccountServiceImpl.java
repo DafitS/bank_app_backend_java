@@ -9,7 +9,7 @@ import com.example.demo.exceptions.custom.*;
 import com.example.demo.exceptions.custom.account.AccountNotActiveException;
 import com.example.demo.exceptions.custom.account.AccountNotExistException;
 import com.example.demo.exceptions.custom.address.UserNotExistException;
-import com.example.demo.mapper.AccountMapper;
+import com.example.demo.mapper.AccountsMapper;
 import com.example.demo.option.OperationType;
 import com.example.demo.option.RoleType;
 import com.example.demo.repository.AccountRepository;
@@ -17,6 +17,7 @@ import com.example.demo.repository.OperationHistoryRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.AccountService;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,19 +28,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class AccountServiceImpl implements AccountService{
 
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final OperationHistoryRepository historyRepository;
-
-    public AccountServiceImpl(AccountRepository accountRepository, UserRepository userRepository, OperationHistoryRepository historyRepository)
-    {
-        this.accountRepository = accountRepository;
-        this.userRepository = userRepository;
-        this.historyRepository = historyRepository;
-    }
+    private final AccountsMapper accountsMapper;
 
     @Override
     public AccountResponseDto createAccount(AccountCreateDto accountCreateDto) {
@@ -48,10 +44,10 @@ public class AccountServiceImpl implements AccountService{
                 .findById(accountCreateDto.getUserId())
                 .orElseThrow(()->new UserNotExistException("User not found!", accountCreateDto.getAccountHolderName()));
 
-        Account account = AccountMapper.mapToAccount(accountCreateDto, user);
+        Account account = accountsMapper.toEntity(accountCreateDto, user);
         Account savedAccount = accountRepository.save(account);
 
-        return AccountMapper.mapToAccountResponseDto(savedAccount);
+        return accountsMapper.toDto(savedAccount);
     }
 
     private void validate(AccountCreateDto accountDto) {
@@ -74,7 +70,7 @@ public class AccountServiceImpl implements AccountService{
                 .findById(id)
                 .orElseThrow(()->new AccountNotExistException("Account not Found!", id));
 
-        return AccountMapper.mapToAccountResponseDto(account);
+        return accountsMapper.toDto(account);
     }
 
     @Transactional
@@ -112,7 +108,7 @@ public class AccountServiceImpl implements AccountService{
 
         historyRepository.save(history);
 
-        return AccountMapper.mapToAccountResponseDto(saveAccount);
+        return accountsMapper.toDto(saveAccount);
     }
 
     @Transactional
@@ -153,13 +149,13 @@ public class AccountServiceImpl implements AccountService{
 
         historyRepository.save(history);
 
-        return AccountMapper.mapToAccountResponseDto(saveAccount);
+        return accountsMapper.toDto(saveAccount);
     }
 
     @Override
     public List<AccountResponseDto> getAllAccounts() {
         List<Account> accounts = accountRepository.findAll();
-        return accounts.stream().map((account) -> AccountMapper.mapToAccountResponseDto(account))
+        return accounts.stream().map(accountsMapper::toDto)
                 .collect(Collectors.toList());
 
 

@@ -6,7 +6,6 @@ import com.example.demo.dto.user.UserUpdateDto;
 import com.example.demo.entity.User;
 import com.example.demo.exceptions.custom.address.UserNotExistException;
 import com.example.demo.exceptions.custom.user.UserNotExistExceptionById;
-import com.example.demo.mapper.UserMapper;
 import com.example.demo.mapper.UsersMapper;
 import com.example.demo.option.RoleType;
 import com.example.demo.repository.UserRepository;

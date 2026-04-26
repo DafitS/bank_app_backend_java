@@ -6,7 +6,6 @@ import com.example.demo.entity.Address;
 import com.example.demo.entity.User;
 import com.example.demo.exceptions.custom.user.UserNotExistExceptionById;
 import com.example.demo.exceptions.custom.address.AddressNotExistException;
-import com.example.demo.mapper.AddressMapper;
 import com.example.demo.mapper.AddressesMapper;
 import com.example.demo.mapper.UsersMapper;
 import com.example.demo.repository.AddressRepository;
@@ -44,7 +43,7 @@ public class AddressServiceImpl implements AddressService {
 
         user.getAddresses().forEach(address -> address.setIsCurrent(false));
 
-        Address newAddress = AddressMapper.mapToEntity(userAddressDto);
+        Address newAddress = addressesMapper.toEntity(userAddressDto);
         newAddress.setUser(user);
         newAddress.setIsCurrent(true);
 
@@ -61,7 +60,7 @@ public class AddressServiceImpl implements AddressService {
                 .findByPublicId(id)
                     .orElseThrow(() -> new AddressNotExistException("Address not found"));
 
-        AddressMapper.partialUpdateAddress(address, userAddressDto);
+        addressesMapper.updateAddress(userAddressDto, address);
 
         Address updatedAddress = addressRepository.save(address);
 
