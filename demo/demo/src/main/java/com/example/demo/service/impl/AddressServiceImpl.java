@@ -7,7 +7,8 @@ import com.example.demo.entity.User;
 import com.example.demo.exceptions.custom.user.UserNotExistExceptionById;
 import com.example.demo.exceptions.custom.address.AddressNotExistException;
 import com.example.demo.mapper.AddressMapper;
-import com.example.demo.mapper.UserMapper;
+import com.example.demo.mapper.AddressesMapper;
+import com.example.demo.mapper.UsersMapper;
 import com.example.demo.repository.AddressRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.AddressService;
@@ -22,7 +23,8 @@ public class AddressServiceImpl implements AddressService {
 
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
-
+    private final AddressesMapper addressesMapper;
+    private final UsersMapper usersMapper;
 
     @Override
     public UserAddressDto getAddressByPublicId(UUID id) {
@@ -31,7 +33,7 @@ public class AddressServiceImpl implements AddressService {
                 .findByPublicId(id)
                     .orElseThrow(() -> new AddressNotExistException("Address not found"));
 
-        return UserMapper.mapToUserAddressDto(address);
+        return addressesMapper.toResponse(address);
     }
 
     @Override
@@ -48,7 +50,7 @@ public class AddressServiceImpl implements AddressService {
 
         addressRepository.save(newAddress);
 
-        return UserMapper.mapToUserResponseDto(user);
+        return usersMapper.toDto(user);
 
 
     }
@@ -63,6 +65,6 @@ public class AddressServiceImpl implements AddressService {
 
         Address updatedAddress = addressRepository.save(address);
 
-        return AddressMapper.mapToDto(updatedAddress);
+        return addressesMapper.toResponse(updatedAddress);
     }
 }

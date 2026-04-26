@@ -32,12 +32,20 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> req
-                        .requestMatchers("/auth/login", "/api/users")
-                        .permitAll().anyRequest().authenticated())
+                        .requestMatchers(
+                                "/auth/login",
+                                "/api/users",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(authenticationJwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 

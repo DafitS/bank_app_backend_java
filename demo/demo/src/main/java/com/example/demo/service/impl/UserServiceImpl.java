@@ -7,6 +7,7 @@ import com.example.demo.entity.User;
 import com.example.demo.exceptions.custom.address.UserNotExistException;
 import com.example.demo.exceptions.custom.user.UserNotExistExceptionById;
 import com.example.demo.mapper.UserMapper;
+import com.example.demo.mapper.UsersMapper;
 import com.example.demo.option.RoleType;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
@@ -22,14 +23,16 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UsersMapper userMapper;
+
 
     @Override
     public UserResponseDto createUser(UserCreateDto userCreateDto) {
-        User user = UserMapper.mapToUser(userCreateDto);
+        User user = userMapper.toEntity(userCreateDto);
         user.setPassword(passwordEncoder.encode(userCreateDto.getPassword()));
         User savedUser = userRepository.save(user);
 
-        return UserMapper.mapToUserResponseDto(savedUser);
+        return userMapper.toDto(savedUser);
     }
 
     @Override
@@ -37,7 +40,7 @@ public class UserServiceImpl implements UserService {
             User user = userRepository
                     .findById(id)
                     .orElseThrow(() -> new UserNotExistExceptionById("User not found!", id));
-            return UserMapper.mapToUserResponseDto(user);
+            return userMapper.toDto(user);
     }
 
     @Override
@@ -45,7 +48,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository
                 .findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return  UserMapper.mapToUserResponseDto(user);
+        return  userMapper.toDto(user);
     }
 
     @Override
@@ -60,7 +63,7 @@ public class UserServiceImpl implements UserService {
         if (dto.getPassword() != null && !dto.getPassword().isBlank()) user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         User savedUser = userRepository.save(user);
-        return UserMapper.mapToUserResponseDto(savedUser);
+        return userMapper.toDto(savedUser);
     }
 
     @Override
